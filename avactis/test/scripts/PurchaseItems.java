@@ -59,7 +59,7 @@ public class PurchaseItems
 	 driver = new InternetExplorerDriver();*/
 	 driver.get("http://avactis:avactis%40123@sandbox.avactis.com/ketan479/");
 //	 handleAuthentication();
-	 wait = new WebDriverWait(driver, 30);
+	 wait = new WebDriverWait(driver, 40);
   }
 
 	
