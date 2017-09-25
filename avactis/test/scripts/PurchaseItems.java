@@ -48,11 +48,11 @@ public class PurchaseItems
   @BeforeClass(alwaysRun = true)
    public void beforeClass() 
   {
-	  /*System.setProperty("webdriver.gecko.driver", "test\\resources\\geckodriver64bit.exe");
+	  System.setProperty("webdriver.gecko.driver", "test\\resources\\geckodriver64bit.exe");
 	  driver = new FirefoxDriver();
-	  */
+	/*  
 	  System.setProperty("webdriver.chrome.driver", "test\\resources\\chromedriver.exe");
-	 driver = new ChromeDriver();
+	 driver = new ChromeDriver();*/
 //	 driver.manage().window().maximize();
 //	 driver.manage().window().fullscreen();
 	 /*System.setProperty("webdriver.ie.driver", "test\\resources\\IEDriverServer.exe");
