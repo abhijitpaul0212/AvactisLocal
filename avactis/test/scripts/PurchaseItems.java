@@ -218,9 +218,7 @@ public class PurchaseItems
 	  driver.quit();
   }
   
-  
-  
-  
+
   public void handleUserAuthentication() //This method runs on Internet Explorer only
   {
 	  String uname = "avactis";
