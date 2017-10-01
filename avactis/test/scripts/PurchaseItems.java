@@ -21,6 +21,7 @@ import org.testng.annotations.BeforeClass;
 
 import static org.testng.Assert.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -50,10 +51,10 @@ public class PurchaseItems
   {
 	  System.setProperty("webdriver.gecko.driver", "test\\resources\\geckodriver64bit.exe");
 	  driver = new FirefoxDriver();
-	/*  
-	  System.setProperty("webdriver.chrome.driver", "test\\resources\\chromedriver.exe");
-	 driver = new ChromeDriver();*/
-//	 driver.manage().window().maximize();
+	  
+	  /*System.setProperty("webdriver.chrome.driver", "test\\resources\\chromedriver.exe");
+	 driver = new ChromeDriver();
+	 driver.manage().window().maximize();*/
 //	 driver.manage().window().fullscreen();
 	 /*System.setProperty("webdriver.ie.driver", "test\\resources\\IEDriverServer.exe");
 	 driver = new InternetExplorerDriver();*/
@@ -64,6 +65,18 @@ public class PurchaseItems
 
 	
   @Test(priority=1)
+  public void shopping()
+  {
+	  signIn();
+	  addToCart();
+	  myCart();
+	  billingShippingAddress();
+	  billingShippingMethod();
+	  placeOrder();
+	  zignOut();
+  }
+  
+  
   public void signIn() 
   {
 	  Homepage.clickSignIn(driver);
@@ -80,59 +93,85 @@ public class PurchaseItems
 	  assertEquals("ORDERS", driver.findElement(By.className("orders_search1")).getText());
   }
   
-  @Test(priority=2)
+
   public void addToCart()
   {
-	  String navigateToProduct1 = "DVD>TV_on_DVD";
-	  String navigateToProduct2 = "DVD>Kids";
-	  String navigateToProduct3 = "DVD>Classic_Films";
+	/* String navigateToProduct1 = "DVD>";
+	 String navigateToProduct2 = "DVD>";
+	    String navigateToProduct3 = "DVD>Classic_Films";
 	  String navigateToProduct4 = "Sport>cid45";
-	  String navigateToProduct5 = "Furniture";
+	  String navigateToProduct5 = "Furniture";   ;Up;Lost*/
 	  
-	  try {
-		Thread.sleep(20000);
-	} catch (InterruptedException e) {
-		// TODO Auto-generated catch block
-		e.printStackTrace();
-	}  
-	  navigateMenu(driver,2,navigateToProduct1);	 
-	  driver.findElement(By.xpath("//*[contains(@href,'House_M_D')]/following-sibling::div[@class='product_buttons']//*[@value='Add To Cart']")).click();
+	/*  String navigateToProduct1 = "DVD;House_M_D;Lost";
+	  String navigateToProduct2 = "Computers;pid172";*/
 	  
-	  try {
-		Thread.sleep(20000);
-	} catch (InterruptedException e) {
-		// TODO Auto-generated catch block
-		e.printStackTrace();
-	}
-	  navigateMenu(driver,2,navigateToProduct2);
+	  String multiLevelMenu = "DVD;House_M_D;#Computers;pid172";
+	  navigateMenuAddToCart(driver, 2, multiLevelMenu);
+	  
+	  String singleLevelMenu = "Furniture;EKTORP_TULLSTA";
+	  navigateMenuAddToCart(driver, 1, singleLevelMenu);
+	
+	//*[contains(@href,'EKTORP Neckroll')]/following-sibling::div[@class='product_buttons']//*[@value='Add To Cart'
+	  
+/*	  navigateMenuAddToCart(driver, 2, navigateToProduct1);
 	  driver.findElement(By.xpath("//*[contains(@href,'Up')]/following-sibling::div[@class='product_buttons']//*[@value='Add To Cart']")).click();
-
-	  try {
-		Thread.sleep(20000);
-	} catch (InterruptedException e) {
-		// TODO Auto-generated catch block
-		e.printStackTrace();
-	}
-	  navigateMenu(driver, 2, navigateToProduct3);
-      driver.findElement(By.xpath("//*[contains(@href,'James')]/following-sibling::div[@class='product_buttons']//*[@value='Add To Cart']")).click();
+	  driver.navigate().refresh();
+//	  navigateMenuAddToCart(driver, 2, navigateToProduct2);
+*/	  
 	  
-      try {
-		Thread.sleep(20000);
+/*	  try {
+		Thread.sleep(10000);
 	} catch (InterruptedException e) {
 		// TODO Auto-generated catch block
 		e.printStackTrace();
 	}
-	  navigateMenu(driver,2,navigateToProduct4);
+*/	
+	  /*	navigateMenu(driver,2,navigateToProduct1);	
+	  driver.findElement(By.xpath("//*[contains(@href,'House_M_D')]/following-sibling::div[@class='product_buttons']//*[@value='Add To Cart']")).click();
 	  try {
-			Thread.sleep(20000);
+			Thread.sleep(10000);
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	  driver.navigate().refresh();
+	  
+	  System.out.println("Done with first add to cart");
+	 
+	  
+  try {
+			Thread.sleep(10000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		  navigateMenu(driver,2,navigateToProduct2);	
+		  driver.findElement(By.xpath("//*[contains(@href,'Up')]/following-sibling::div[@class='product_buttons']//*[@value='Add To Cart']")).click();
+		  try {
+				Thread.sleep(10000);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		  driver.navigate().refresh();
+		  
+		  System.out.println("Done with second add to cart");*/
+	  
+	  
+	/*  navigateMenu(driver,2,navigateToProduct2);
+	  driver.findElement(By.xpath("//*[contains(@href,'Up')]/following-sibling::div[@class='product_buttons']//*[@value='Add To Cart']")).click();
+	  System.out.println("Done with second add to cart");*/
+
+/*	  navigateMenu(driver,2,navigateToProduct3);
+      driver.findElement(By.xpath("//*[contains(@href,'James')]/following-sibling::div[@class='product_buttons']//*[@value='Add To Cart']")).click();
+      System.out.println("Done with third add to cart");
+ 	  
+	  navigateMenu(driver,1,navigateToProduct5);
 	  driver.findElement(By.xpath("//*[contains(@href,'EKTORP_TULLSTA')]/following-sibling::div[@class='product_buttons']//*[@value='Add To Cart']")).click();
+	  System.out.println("Done with fourth add to cart");*/
   }
   
- // @Test(priority=3)
+ /* @Test(priority=3)
   public void checkOut()
   {
 	driver.navigate().refresh();
@@ -140,9 +179,29 @@ public class PurchaseItems
 	Actions action4 = new Actions(driver);
 	action4.moveToElement(checkOutPreview).build().perform();
 	driver.findElement(By.xpath("//*[@class='top-cart-content']//*[contains(text(),'Checkout')]")).click();
+  }*/
+  
+  
+  public void myCart()
+  {
+	driver.navigate().refresh();
+	driver.findElement(By.cssSelector("a[href='cart.php']")).click();
+	try {
+		Thread.sleep(10000);
+	} catch (InterruptedException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
+	System.out.println("I am about to click Checkout button");
+//	driver.findElement(By.cssSelector("*[class='top-cart-content'] a[href*='checkout.php']")).click();
+	driver.findElement(By.xpath("html/body/div[4]/div/div/div/div/div/div[1]/div/div/div[3]/a[2]")).click();
+	
+//	"//*[@class='top-cart-content']//a[contains(@href,'checkout.php')]"
+//	html/body/div[4]/div/div/div/div/div/div[1]/div/div/div[3]/a[1]
+	//*[@class='top-cart-content']//a[contains(@href,'checkout.php')]
   }
   
-  //@Test(priority=4)
+  
   public void billingShippingAddress()
   {
 	String firstName = driver.findElement(By.xpath("//*[@name='billingInfo[Firstname]']")).getAttribute("value");
@@ -172,7 +231,7 @@ public class PurchaseItems
 
   }
   
- //@Test(priority=5)
+ 
   public void billingShippingMethod()
   {
 	  List<WebElement> shippingMethods = driver.findElements(By.xpath("//div[@class ='shipping_method_name']/label"));
@@ -186,11 +245,11 @@ public class PurchaseItems
 	  driver.findElement(By.xpath("//div[@class='checkout_buttons']/input[contains(@onclick,'submitStep(2)')]")).click();
   }
   
-  @Test(priority=6)
+ 
   public void placeOrder()
   { 
 	 try {
-		Thread.sleep(20000);
+		Thread.sleep(10000);
 	} catch (InterruptedException e) {
 		// TODO Auto-generated catch block
 		e.printStackTrace();
@@ -202,7 +261,7 @@ public class PurchaseItems
 	 System.out.println("Your order ID is "+orderId[1]);
   } 
   
- //@Test(priority=8)
+ 
   public void zignOut()
   {
 	  driver.findElement(By.xpath("//*[contains(@href,'customer_sign_out')]")).click();
@@ -214,7 +273,6 @@ public class PurchaseItems
   @AfterClass
   public void afterClass() 
   {
-	  driver.navigate().refresh();
 	  driver.quit();
   }
   
@@ -229,20 +287,21 @@ public class PurchaseItems
 	  alert.authenticateUsing(new UserAndPassword(uname, pwd));	  
   }
   
-  public void navigateMenu(WebDriver driver, int menuLevels, String menuString) //DVD > TV on DVD > House_M_D
+ /* public void navigateMenu(WebDriver driver, int menuLevels, String menuString) //DVD > TV on DVD > House_M_D
   {
 	  String[] menus = menuString.split(">");
-/*	  System.out.println(menus[0]);
-	  System.out.println(menus[1]);*/
+	  System.out.println(menus[0]);
+	  System.out.println(menus[1]);
 	
 	  WebElement mainMenu;
 	  Actions action;
       switch (menuLevels) 
       {
-          case 1:  /*Waiting.WaitForElement(driver, By.cssSelector("*[class='header-navigation'] *[href*='"+menus[0]+"']"), 20);*/
+          case 1:  Waiting.WaitForElement(driver, By.cssSelector("*[class='header-navigation'] *[href*='"+menus[0]+"']"), 20);
         	  	   driver.findElement(By.cssSelector("*[class='header-navigation'] *[href*='"+menus[0]+"']")).click();
                    break;
-          case 2:  /*Waiting.WaitForElement(driver, By.cssSelector("*[href*='"+menus[0]+"'][class='dropdown-toggle']"), 20);*/
+          case 2:  Waiting.WaitForElement(driver, By.cssSelector("*[href*='"+menus[0]+"'][class='dropdown-toggle']"), 20);
+        	  	   driver.findElement(By.cssSelector("*[href*='"+menus[0]+"'][class='dropdown-toggle']")).click();
         	  	   mainMenu = driver.findElement(By.cssSelector("*[href*='"+menus[0]+"'][class='dropdown-toggle']"));
     	  		   action = new Actions(driver);
     	  		   action.moveToElement(mainMenu).build().perform();
@@ -252,4 +311,58 @@ public class PurchaseItems
       }  
 
   }
+*/  
+  public void navigateMenuAddToCart(WebDriver driver, int menuLevels, String menuString)
+  {
+	  WebElement AddToCart;
+	  
+	  
+	  String[] fullMenu = menuString.split("#");
+	  for(int i = 0; i < fullMenu.length; i++)
+	  {
+		  String[] partialMenu = fullMenu[i].split(";");  
+		
+	      switch (menuLevels) 
+	      {
+	          case 1:  driver.findElement(By.cssSelector("*[class='header-navigation'] *[href*='"+partialMenu[0]+"']")).click();
+//	        	  	   for (int i = 1; i < items.size(); i++) 
+	          		   for(int j = 1; j < partialMenu.length;j++)
+	        		   { 
+	        	  		 AddToCart = driver.findElement(By.xpath("//*[contains(@href,'"+partialMenu[j]+"')]/following-sibling::div[@class='product_buttons']//*[@value='Add To Cart']"));
+	        	  		 AddToCart.click();
+	        	  		 System.out.println(AddToCart);
+	        			 System.out.println(partialMenu[j]+" is added to cart");
+	        			 try {
+							Thread.sleep(10000);
+						} catch (InterruptedException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+	//        			 driver.navigate().refresh();
+	        		   }
+	                   break;
+	                   
+	          case 2:  driver.findElement(By.cssSelector("*[href*='"+partialMenu[0]+"'][class='dropdown-toggle']")).click();
+//	          		   for (int i = 1; i < items.size(); i++) 
+	          		   for(int j = 1; j < partialMenu.length;j++)
+	          		   { 
+	          			 AddToCart = driver.findElement(By.xpath("//*[contains(@href,'"+partialMenu[j]+"')]/following-sibling::div[@class='product_buttons']//*[@value='Add To Cart']"));
+	          			 AddToCart.click();
+	        	  		 System.out.println(AddToCart);
+	          			 System.out.println(partialMenu[j]+" is added to cart");
+	          			 try {
+							Thread.sleep(10000);
+						} catch (InterruptedException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+	//          			 driver.navigate().refresh();
+	          		   }
+	    	  		   break;    
+		  
+	      }
+	  }
+
+  }
+  
 }
