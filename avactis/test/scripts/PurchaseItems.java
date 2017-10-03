@@ -64,7 +64,7 @@ public class PurchaseItems
   }
 
 	
-  @Test(priority=1)
+// @Test(priority=1)
   public void shopping()
   {
 	  signIn();
@@ -74,6 +74,18 @@ public class PurchaseItems
 	  billingShippingMethod();
 	  placeOrder();
 	  zignOut();
+  }
+  
+ @Test(priority=2)
+  public void orderValidating()
+  {
+	  String multiLevelMenu = "DVD;House, M.D.#Computers;mobile";	  
+	  String singleLevelMenu = "Furniture;EKTORP TULLSTA Chair";	  
+	  String expectedMenuList = singleLevelMenu+"#"+multiLevelMenu;
+	  signIn();
+	  int[] result = validateOrder(driver, "00870",expectedMenuList);
+	  
+	  assertEquals(result[0], result[1],"Actual purchased item(s) count doesnot match with expected");
   }
   
   
@@ -104,12 +116,15 @@ public class PurchaseItems
 	  
 	/*  String navigateToProduct1 = "DVD;House_M_D;Lost";
 	  String navigateToProduct2 = "Computers;pid172";*/
-	  
-	  String multiLevelMenu = "DVD;House_M_D;#Computers;pid172";
+	 
+//	  String multiLevelMenu = "DVD;House_M_D#Computers;pid172";
+	  String multiLevelMenu = "DVD;House, M.D.#Computers;mobile";
 	  navigateMenuAddToCart(driver, 2, multiLevelMenu);
 	  
-	  String singleLevelMenu = "Furniture;EKTORP_TULLSTA";
+	  String singleLevelMenu = "Furniture;EKTORP TULLSTA Chair";
 	  navigateMenuAddToCart(driver, 1, singleLevelMenu);
+	  
+	  String expectedMenuList = singleLevelMenu+multiLevelMenu;
 	
 	//*[contains(@href,'EKTORP Neckroll')]/following-sibling::div[@class='product_buttons']//*[@value='Add To Cart'
 	  
@@ -259,6 +274,8 @@ public class PurchaseItems
 	 String orderIds = driver.findElement(By.xpath("//label[contains(text(),'Order Id')]/following-sibling::div")).getText();
 	 String[] orderId = orderIds.split("#");
 	 System.out.println("Your order ID is "+orderId[1]);
+//	 validateOrder(driver, orderId[1]);
+	 
   } 
   
  
@@ -328,8 +345,9 @@ public class PurchaseItems
 //	        	  	   for (int i = 1; i < items.size(); i++) 
 	          		   for(int j = 1; j < partialMenu.length;j++)
 	        		   { 
-	        	  		 AddToCart = driver.findElement(By.xpath("//*[contains(@href,'"+partialMenu[j]+"')]/following-sibling::div[@class='product_buttons']//*[@value='Add To Cart']"));
-	        	  		 AddToCart.click();
+//	        	  		 AddToCart = driver.findElement(By.xpath("//*[contains(@href,'"+partialMenu[j]+"')]/following-sibling::div[@class='product_buttons']//*[@value='Add To Cart']"));
+	          			 AddToCart = driver.findElement(By.xpath("//h3[text()='"+partialMenu[j]+"']/ancestor::a[1]/following-sibling::div[@class='product_buttons']//*[@value='Add To Cart']"));
+	          			 AddToCart.click();
 	        	  		 System.out.println(AddToCart);
 	        			 System.out.println(partialMenu[j]+" is added to cart");
 	        			 try {
@@ -346,7 +364,8 @@ public class PurchaseItems
 //	          		   for (int i = 1; i < items.size(); i++) 
 	          		   for(int j = 1; j < partialMenu.length;j++)
 	          		   { 
-	          			 AddToCart = driver.findElement(By.xpath("//*[contains(@href,'"+partialMenu[j]+"')]/following-sibling::div[@class='product_buttons']//*[@value='Add To Cart']"));
+//	          			 AddToCart = driver.findElement(By.xpath("//*[contains(@href,'"+partialMenu[j]+"')]/following-sibling::div[@class='product_buttons']//*[@value='Add To Cart']"));
+	          			 AddToCart = driver.findElement(By.xpath("//h3[text()='"+partialMenu[j]+"']/ancestor::a[1]/following-sibling::div[@class='product_buttons']//*[@value='Add To Cart']"));
 	          			 AddToCart.click();
 	        	  		 System.out.println(AddToCart);
 	          			 System.out.println(partialMenu[j]+" is added to cart");
@@ -364,5 +383,90 @@ public class PurchaseItems
 	  }
 
   }
+  
+  public int[] validateOrder(WebDriver driver, String orderId, String expectedItems)
+  {
+	  driver.findElement(By.xpath("//*[@href='sign-in.php']")).click();
+	  driver.findElement(By.xpath("//*[@name='order_id']")).sendKeys(orderId);
+	  driver.findElement(By.xpath("//*[@class='col-lg-1']/*[@class='en btn blue button_order_search input_submit']")).click();
+	  try {
+		Thread.sleep(5000);
+	} catch (InterruptedException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
+	  driver.findElement(By.xpath("//*[@title='Order Info']")).click();
+	  System.out.println("Validation started");
+	  
+	  
+	  List<WebElement> actualOrderItems = driver.findElements(By.xpath("//div[@class = 'product_name']"));		
+	  String actualItems = "";
+	  
+	  for(WebElement allItems: actualOrderItems)
+		{
+//			System.out.println(allItems.getText());
+			actualItems = allItems.getText()+";"+actualItems;			
+		}
+	  System.out.println(actualItems);
+	  int[] result = compareItems(expectedItems, actualItems);
+	  return result;
+	  
+		
+	  
+  }
+  
+  public static int[] compareItems(String expectedMenuList, String actualMenuList)
+	{
+		String matchValue = null;
+		int actMatch = 0;
+		int expMatch = 0;
+		
+		 String[] fullMenu = expectedMenuList.split("#");
+		  for(int i = 0; i < fullMenu.length; i++)
+		  {
+			  String[] partialMenu = fullMenu[i].split(";");
+			  expMatch = expMatch + (partialMenu.length -1);
+		  }
+		
+		
+		
+		String replaceExp = expectedMenuList.replaceAll("#|;", ">"); 
+      String[] fullMenuExp = replaceExp.split(">");        
+      List<String> itemsExp= new ArrayList<String>();
+      for(int i = 0; i< fullMenuExp.length ; i++)
+      {
+      	itemsExp.add(fullMenuExp[i]);
+      }
+      System.out.println("Added items to expected list "+itemsExp);
+      String replaceAct = actualMenuList.replaceAll(" \\(.*?\\)", "");
+      System.out.println("Modified actual list "+replaceAct);
+      for(String item: itemsExp)
+      {
+    	  System.out.println(item);
+      	if (replaceAct.matches("(.*)"+item+"(.*)"))
+      	{
+      		actMatch++;
+      		System.out.println("Actual match count "+actMatch);
+      	}
+      }
+   /* ArrayList<Integer> result = new ArrayList<Integer>();
+    result.add(expMatch);
+    result.add(actMatch);
+  	return result;*/  	
+  	
+  	int[] result = new int[2];
+  	result[0] = expMatch;
+  	result[1] = actMatch;
+  	
+  	System.out.println(result[0]+":"+result[1]);
+  	return result;
+  	/*if (actMatch==expMatch)
+  	{
+  		return matchValue = "Matched. Expected count: "+expMatch+" and Actual count: "+actMatch; 
+  		
+  	}
+		return matchValue = "Not matched. Expected count: "+expMatch+" and Actual count: "+actMatch;*/
+		
+	}
   
 }
