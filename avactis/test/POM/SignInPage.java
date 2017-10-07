@@ -2,22 +2,23 @@ package POM;
 
 import static org.testng.AssertJUnit.assertEquals;
 
-import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
-import org.openqa.selenium.support.How;
 import org.openqa.selenium.support.PageFactory;
 import org.openqa.selenium.support.ui.LoadableComponent;
+import utility.ConfigProperties;
 
 import scripts.Log;
-import utility.Waiting;
 
 public class SignInPage extends LoadableComponent<SignInPage> 
 {
+	/*String url;
+	private static String title = ConfigProperties.getProperty("HOMEPAGE_TITLE");*/
+	
 	private static WebDriver driver;
 	private String url = "http://avactis:avactis%40123@sandbox.avactis.com/ketan479/";
-	private String title = "Avactis Demo Store";
+	private static String title = "Avactis Demo Store";
 	
 	@FindBy(css = "*[href*='ketan479/sign-in.php']")
 	WebElement signInLink;
@@ -37,6 +38,8 @@ public class SignInPage extends LoadableComponent<SignInPage>
 	
 	public SignInPage(WebDriver driver)
 	{
+		/*url = ConfigProperties.getProperty("STORE_URL");
+		System.out.println("URL is " + url);*/
 		SignInPage.driver = driver;
 		PageFactory.initElements(driver, this);
 		Log.info("SignIn Page loaded");
