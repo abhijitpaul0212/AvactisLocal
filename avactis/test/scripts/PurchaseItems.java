@@ -14,8 +14,11 @@ package scripts;
 
 import org.testng.annotations.Test;
 
+import POM.AddToCartPage;
+import POM.CheckOutPage;
 import POM.MyAccountPage;
 import POM.SignInPage;
+import POM.SignOutPage;
 import POM.ViewOrderPage;
 import utility.Homepage;
 import utility.Waiting;
@@ -51,7 +54,12 @@ public class PurchaseItems
   private SignInPage signInP;
   private MyAccountPage myAccountP;
   private ViewOrderPage viewOrderP;
+  private AddToCartPage addToCartP;
+  private CheckOutPage checkOutP;
+  private SignOutPage signOutP;
   private String OrderID = null;
+  private String multiLevelMenu = "DVD;Forbidden Planet#Computers;mobile";
+  private String singleLevelMenu = "Furniture;EKTORP TULLSTA Chair";
   
   @BeforeClass(alwaysRun = true)
    public void beforeClass() 
@@ -63,7 +71,9 @@ public class PurchaseItems
    	  signInP.get();
    	  myAccountP = new MyAccountPage(driver);
    	  viewOrderP = new ViewOrderPage(driver);
-   	  
+   	  addToCartP = new AddToCartPage(driver);
+   	  checkOutP = new CheckOutPage(driver); 
+   	  signOutP = new SignOutPage(driver);
   }
 
 	
@@ -71,13 +81,15 @@ public class PurchaseItems
   public void shopping()
   {
 	  Log.info("---------------- Test Case : 'Placing order' begins ----------------");
-	  signInP.doSignIn("abhijitpaul_02@yahoo.com", "password123");	  
-	  addToCart();
-	  myCart();
-	  billingShippingAddress();
-	  billingShippingMethod();
-	  OrderID = placeOrder();
-	  signOut();
+	  signInP.doSignIn("abhijitpaul_02@yahoo.com", "password123");	
+	  addToCartP.navigateMenuAddToCart(driver, 2, multiLevelMenu);	  
+	  addToCartP.navigateMenuAddToCart(driver, 1, singleLevelMenu);	  
+//	  addToCart();
+	  checkOutP.myCartCheckOut();
+	  checkOutP.billingShippingAddress();
+	  checkOutP.billingShippingMethod();
+	  OrderID = checkOutP.placeOrder();
+      signOutP.signOut();
 	  Log.info("---------------- Test Case : 'Placing order' ends ----------------");
   }
   
@@ -85,14 +97,34 @@ public class PurchaseItems
   public void orderValidating()
   {
 	  Log.info("---------------- Test Case : 'Validating placed order' begins ----------------");
-	  String multiLevelMenu = "DVD;Forbidden Planet#Computers;mobile";	  
-	  String singleLevelMenu = "Furniture;EKTORP TULLSTA Chair";	  
 	  String expectedMenuList = singleLevelMenu+"#"+multiLevelMenu;
 	  signInP.doSignIn("abhijitpaul_02@yahoo.com", "password123");
 	  myAccountP.searchByOrderID(OrderID);
-	  viewOrderP.compareItems(driver,expectedMenuList);
+	  ViewOrderPage.compareItems(driver,expectedMenuList);
+	  signOutP.signOut();
 	  Log.info("---------------- Test Case : 'Validating placed order' ends ----------------");
   }
+ 
+ @AfterClass
+ public void afterClass() 
+ {
+	  driver.quit();
+ }
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
   
   
   /*public void signIn() 
@@ -113,16 +145,16 @@ public class PurchaseItems
   }*/
   
 
-  public void addToCart()
+  /*public void addToCart()
   {
-	/* String navigateToProduct1 = "DVD>";
+	 String navigateToProduct1 = "DVD>";
 	 String navigateToProduct2 = "DVD>";
 	    String navigateToProduct3 = "DVD>Classic_Films";
 	  String navigateToProduct4 = "Sport>cid45";
-	  String navigateToProduct5 = "Furniture";   ;Up;Lost*/
+	  String navigateToProduct5 = "Furniture";   ;Up;Lost
 	  
-	/*  String navigateToProduct1 = "DVD;House_M_D;Lost";
-	  String navigateToProduct2 = "Computers;pid172";*/
+	  String navigateToProduct1 = "DVD;House_M_D;Lost";
+	  String navigateToProduct2 = "Computers;pid172";
 	 
 //	  String multiLevelMenu = "DVD;House_M_D#Computers;pid172";
 	  String multiLevelMenu = "DVD;Forbidden Planet#Computers;mobile";
@@ -135,20 +167,20 @@ public class PurchaseItems
 	
 	//*[contains(@href,'EKTORP Neckroll')]/following-sibling::div[@class='product_buttons']//*[@value='Add To Cart'
 	  
-/*	  navigateMenuAddToCart(driver, 2, navigateToProduct1);
+	  navigateMenuAddToCart(driver, 2, navigateToProduct1);
 	  driver.findElement(By.xpath("//*[contains(@href,'Up')]/following-sibling::div[@class='product_buttons']//*[@value='Add To Cart']")).click();
 	  driver.navigate().refresh();
 //	  navigateMenuAddToCart(driver, 2, navigateToProduct2);
-*/	  
 	  
-/*	  try {
+	  
+	  try {
 		Thread.sleep(10000);
 	} catch (InterruptedException e) {
 		// TODO Auto-generated catch block
 		e.printStackTrace();
 	}
-*/	
-	  /*	navigateMenu(driver,2,navigateToProduct1);	
+	
+	  	navigateMenu(driver,2,navigateToProduct1);	
 	  driver.findElement(By.xpath("//*[contains(@href,'House_M_D')]/following-sibling::div[@class='product_buttons']//*[@value='Add To Cart']")).click();
 	  try {
 			Thread.sleep(10000);
@@ -177,21 +209,21 @@ public class PurchaseItems
 			}
 		  driver.navigate().refresh();
 		  
-		  System.out.println("Done with second add to cart");*/
+		  System.out.println("Done with second add to cart");
 	  
 	  
-	/*  navigateMenu(driver,2,navigateToProduct2);
+	  navigateMenu(driver,2,navigateToProduct2);
 	  driver.findElement(By.xpath("//*[contains(@href,'Up')]/following-sibling::div[@class='product_buttons']//*[@value='Add To Cart']")).click();
-	  System.out.println("Done with second add to cart");*/
+	  System.out.println("Done with second add to cart");
 
-/*	  navigateMenu(driver,2,navigateToProduct3);
+	  navigateMenu(driver,2,navigateToProduct3);
       driver.findElement(By.xpath("//*[contains(@href,'James')]/following-sibling::div[@class='product_buttons']//*[@value='Add To Cart']")).click();
       System.out.println("Done with third add to cart");
  	  
 	  navigateMenu(driver,1,navigateToProduct5);
 	  driver.findElement(By.xpath("//*[contains(@href,'EKTORP_TULLSTA')]/following-sibling::div[@class='product_buttons']//*[@value='Add To Cart']")).click();
-	  System.out.println("Done with fourth add to cart");*/
-  }
+	  System.out.println("Done with fourth add to cart");
+  }*/
   
  /* @Test(priority=3)
   public void checkOut()
@@ -204,7 +236,7 @@ public class PurchaseItems
   }*/
   
   
-  public void myCart()
+/*  public void myCart()
   {
 	driver.navigate().refresh();
 	driver.findElement(By.cssSelector("a[href='cart.php']")).click();
@@ -221,10 +253,10 @@ public class PurchaseItems
 //	"//*[@class='top-cart-content']//a[contains(@href,'checkout.php')]"
 //	html/body/div[4]/div/div/div/div/div/div[1]/div/div/div[3]/a[1]
 	//*[@class='top-cart-content']//a[contains(@href,'checkout.php')]
-  }
+  }*/
   
   
-  public void billingShippingAddress()
+ /* public void billingShippingAddress()
   {
 	String firstName = driver.findElement(By.xpath("//*[@name='billingInfo[Firstname]']")).getAttribute("value");
 	//System.out.println(firstName);
@@ -251,10 +283,10 @@ public class PurchaseItems
 	}
 	
 
-  }
+  }*/
   
  
-  public void billingShippingMethod()
+  /*public void billingShippingMethod()
   {
 	  List<WebElement> shippingMethods = driver.findElements(By.xpath("//div[@class ='shipping_method_name']/label"));
 	  for(WebElement shippingMethod:shippingMethods)
@@ -265,10 +297,10 @@ public class PurchaseItems
 		  }
 	  }
 	  driver.findElement(By.xpath("//div[@class='checkout_buttons']/input[contains(@onclick,'submitStep(2)')]")).click();
-  }
+  }*/
   
  
-  public String placeOrder()
+/*  public String placeOrder()
   { 
 	 try {
 		Thread.sleep(10000);
@@ -278,12 +310,12 @@ public class PurchaseItems
 	}
 	 driver.findElement(By.xpath("//*[@value='Place Order']")).click();
 //	 driver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
-/*	 try {
+	 try {
 		Thread.sleep(15000);
 	} catch (InterruptedException e) {
 		// TODO Auto-generated catch block
 		e.printStackTrace();
-	}*/
+	}
 	 
 	 WebDriverWait wait = new WebDriverWait(driver, 30);
 	 wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//label[contains(text(),'Order Id')]")));
@@ -295,25 +327,20 @@ public class PurchaseItems
 	 
 //	 validateOrder(driver, orderId[1]);
 	 
-  } 
+  } */
   
  
-  public void signOut()
+ /* public void signOut()
   {
 	  driver.findElement(By.xpath("//*[contains(@href,'customer_sign_out')]")).click();
 	  //Post logout validation
-	 assertEquals("Sign In",driver.findElement(By.xpath("//*[contains(@href,'sign-in')]")).getText());
+	  assertEquals("Sign In",driver.findElement(By.xpath("//*[contains(@href,'sign-in')]")).getText());
 	  
-  }
+  }*/
   
-  @AfterClass
-  public void afterClass() 
-  {
-//	  driver.quit();
-  }
   
 
-  public void handleUserAuthentication() //This method runs on Internet Explorer only
+  /*public void handleUserAuthentication() //This method runs on Internet Explorer only
   {
 	  String uname = "avactis";
 	  String pwd = "avactis@123";
@@ -321,7 +348,7 @@ public class PurchaseItems
 	  WebDriverWait wait = new WebDriverWait(driver, 10);      
 	  Alert alert = wait.until(ExpectedConditions.alertIsPresent());     
 	  alert.authenticateUsing(new UserAndPassword(uname, pwd));	  
-  }
+  }*/
   
  /* public void navigateMenu(WebDriver driver, int menuLevels, String menuString) //DVD > TV on DVD > House_M_D
   {
@@ -348,7 +375,7 @@ public class PurchaseItems
 
   }
 */  
-  public void navigateMenuAddToCart(WebDriver driver, int menuLevels, String menuString)
+/*  public void navigateMenuAddToCart(WebDriver driver, int menuLevels, String menuString)
   {
 	  WebElement AddToCart;
 	  
@@ -402,8 +429,8 @@ public class PurchaseItems
 	  }
 
   }
-  
-  public int[] validateOrder(WebDriver driver, String orderId, String expectedItems)
+*/  
+/*  public int[] validateOrder(WebDriver driver, String orderId, String expectedItems)
   {
 	  driver.findElement(By.xpath("//*[@href='sign-in.php']")).click();
 	  driver.findElement(By.xpath("//*[@name='order_id']")).sendKeys(orderId);
@@ -468,10 +495,10 @@ public class PurchaseItems
 //				System.out.println("Actual match count "+actMatch);
 			}
 		}
-   /* ArrayList<Integer> result = new ArrayList<Integer>();
+    ArrayList<Integer> result = new ArrayList<Integer>();
     result.add(expMatch);
     result.add(actMatch);
-  	return result;*/  	
+  	return result;  	
   	
 		int[] result = new int[2];
 		result[0] = expMatch;
@@ -479,13 +506,13 @@ public class PurchaseItems
   	
 		System.out.println(result[0]+":"+result[1]);
 		return result;
-  	/*if (actMatch==expMatch)
+  	if (actMatch==expMatch)
   	{
   		return matchValue = "Matched. Expected count: "+expMatch+" and Actual count: "+actMatch; 
   		
   	}
-		return matchValue = "Not matched. Expected count: "+expMatch+" and Actual count: "+actMatch;*/
+		return matchValue = "Not matched. Expected count: "+expMatch+" and Actual count: "+actMatch;
 		
-	}
+	}*/
   
 }

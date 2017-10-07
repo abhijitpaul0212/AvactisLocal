@@ -86,6 +86,7 @@ public class RegistrationPage extends LoadableComponent<RegistrationPage>
 		 this.driver = driver;
 		 PageFactory.initElements(driver, this);
 		 Log.info("Browser launched");
+		 driver.manage().window().maximize();
 	}		
 		
 	@Override
