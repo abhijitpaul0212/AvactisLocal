@@ -14,6 +14,9 @@ package scripts;
 
 import org.testng.annotations.Test;
 
+import POM.MyAccountPage;
+import POM.SignInPage;
+import POM.ViewOrderPage;
 import utility.Homepage;
 import utility.Waiting;
 
@@ -45,53 +48,57 @@ public class PurchaseItems
 {
   private WebDriver driver;
   private WebDriverWait wait;
+  private SignInPage signInP;
+  private MyAccountPage myAccountP;
+  private ViewOrderPage viewOrderP;
+  private String OrderID = null;
   
   @BeforeClass(alwaysRun = true)
    public void beforeClass() 
   {
 	  System.setProperty("webdriver.gecko.driver", "test\\resources\\geckodriver64bit.exe");
 	  driver = new FirefoxDriver();
-	  
-	  /*System.setProperty("webdriver.chrome.driver", "test\\resources\\chromedriver.exe");
-	 driver = new ChromeDriver();
-	 driver.manage().window().maximize();*/
-//	 driver.manage().window().fullscreen();
-	 /*System.setProperty("webdriver.ie.driver", "test\\resources\\IEDriverServer.exe");
-	 driver = new InternetExplorerDriver();*/
-	 driver.get("http://avactis:avactis%40123@sandbox.avactis.com/ketan479/");
-//	 handleAuthentication();
-	 wait = new WebDriverWait(driver, 30);
+   	  wait = new WebDriverWait(driver, 30);
+   	  signInP = new SignInPage(driver);
+   	  signInP.get();
+   	  myAccountP = new MyAccountPage(driver);
+   	  viewOrderP = new ViewOrderPage(driver);
+   	  
   }
 
 	
-// @Test(priority=1)
+ @Test(priority=1)
   public void shopping()
   {
-	  signIn();
+	  Log.info("---------------- Test Case : 'Placing order' begins ----------------");
+	  signInP.doSignIn("abhijitpaul_02@yahoo.com", "password123");	  
 	  addToCart();
 	  myCart();
 	  billingShippingAddress();
 	  billingShippingMethod();
-	  placeOrder();
-	  zignOut();
+	  OrderID = placeOrder();
+	  signOut();
+	  Log.info("---------------- Test Case : 'Placing order' ends ----------------");
   }
   
  @Test(priority=2)
   public void orderValidating()
   {
-	  String multiLevelMenu = "DVD;House, M.D.#Computers;mobile";	  
+	  Log.info("---------------- Test Case : 'Validating placed order' begins ----------------");
+	  String multiLevelMenu = "DVD;Forbidden Planet#Computers;mobile";	  
 	  String singleLevelMenu = "Furniture;EKTORP TULLSTA Chair";	  
 	  String expectedMenuList = singleLevelMenu+"#"+multiLevelMenu;
-	  signIn();
-	  int[] result = validateOrder(driver, "00870",expectedMenuList);
-	  
-	  assertEquals(result[0], result[1],"Actual purchased item(s) count doesnot match with expected");
+	  signInP.doSignIn("abhijitpaul_02@yahoo.com", "password123");
+	  myAccountP.searchByOrderID(OrderID);
+	  viewOrderP.compareItems(driver,expectedMenuList);
+	  Log.info("---------------- Test Case : 'Validating placed order' ends ----------------");
   }
   
   
-  public void signIn() 
+  /*public void signIn() 
   {
-	  Homepage.clickSignIn(driver);
+//	  Homepage.clickSignIn(driver);
+	  
 	  By waitForAccountSignInForm= By.cssSelector("*[for='account_sign_in_form_email_id']");
 	  By waitForOrderSearch = By.className("orders_search1");
 	    
@@ -101,9 +108,9 @@ public class PurchaseItems
 	  driver.findElement(By.id("account_sign_in_form_passwd_id")).sendKeys("password123");
 	  driver.findElement(By.cssSelector("*[value='Sign In']")).click();
 	  
-	  Waiting.WaitForElement(driver, waitForOrderSearch, 30).equals("ORDERS");
-	  assertEquals("ORDERS", driver.findElement(By.className("orders_search1")).getText());
-  }
+//	  Waiting.WaitForElement(driver, waitForOrderSearch, 30).equals("ORDERS");
+//	  assertEquals("ORDERS", driver.findElement(By.className("orders_search1")).getText());
+  }*/
   
 
   public void addToCart()
@@ -118,7 +125,7 @@ public class PurchaseItems
 	  String navigateToProduct2 = "Computers;pid172";*/
 	 
 //	  String multiLevelMenu = "DVD;House_M_D#Computers;pid172";
-	  String multiLevelMenu = "DVD;House, M.D.#Computers;mobile";
+	  String multiLevelMenu = "DVD;Forbidden Planet#Computers;mobile";
 	  navigateMenuAddToCart(driver, 2, multiLevelMenu);
 	  
 	  String singleLevelMenu = "Furniture;EKTORP TULLSTA Chair";
@@ -261,7 +268,7 @@ public class PurchaseItems
   }
   
  
-  public void placeOrder()
+  public String placeOrder()
   { 
 	 try {
 		Thread.sleep(10000);
@@ -270,16 +277,28 @@ public class PurchaseItems
 		e.printStackTrace();
 	}
 	 driver.findElement(By.xpath("//*[@value='Place Order']")).click();
-	 driver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
+//	 driver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
+/*	 try {
+		Thread.sleep(15000);
+	} catch (InterruptedException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}*/
+	 
+	 WebDriverWait wait = new WebDriverWait(driver, 30);
+	 wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//label[contains(text(),'Order Id')]")));
+//	 Waiting.WaitForElement(driver, By.xpath("//label[contains(text(),'Order Id')]"), 30);
 	 String orderIds = driver.findElement(By.xpath("//label[contains(text(),'Order Id')]/following-sibling::div")).getText();
 	 String[] orderId = orderIds.split("#");
-	 System.out.println("Your order ID is "+orderId[1]);
+	 Log.info("Your order ID is "+orderId[1]);
+	 return orderId[1];
+	 
 //	 validateOrder(driver, orderId[1]);
 	 
   } 
   
  
-  public void zignOut()
+  public void signOut()
   {
 	  driver.findElement(By.xpath("//*[contains(@href,'customer_sign_out')]")).click();
 	  //Post logout validation
@@ -290,7 +309,7 @@ public class PurchaseItems
   @AfterClass
   public void afterClass() 
   {
-	  driver.quit();
+//	  driver.quit();
   }
   
 
@@ -396,7 +415,7 @@ public class PurchaseItems
 		e.printStackTrace();
 	}
 	  driver.findElement(By.xpath("//*[@title='Order Info']")).click();
-	  System.out.println("Validation started");
+//	  System.out.println("Validation started");
 	  
 	  
 	  List<WebElement> actualOrderItems = driver.findElements(By.xpath("//div[@class = 'product_name']"));		
@@ -407,7 +426,7 @@ public class PurchaseItems
 //			System.out.println(allItems.getText());
 			actualItems = allItems.getText()+";"+actualItems;			
 		}
-	  System.out.println(actualItems);
+//	  System.out.println(actualItems);
 	  int[] result = compareItems(expectedItems, actualItems);
 	  return result;
 	  
@@ -431,35 +450,35 @@ public class PurchaseItems
 		
 		
 		String replaceExp = expectedMenuList.replaceAll("#|;", ">"); 
-      String[] fullMenuExp = replaceExp.split(">");        
-      List<String> itemsExp= new ArrayList<String>();
-      for(int i = 0; i< fullMenuExp.length ; i++)
-      {
-      	itemsExp.add(fullMenuExp[i]);
-      }
-      System.out.println("Added items to expected list "+itemsExp);
-      String replaceAct = actualMenuList.replaceAll(" \\(.*?\\)", "");
-      System.out.println("Modified actual list "+replaceAct);
-      for(String item: itemsExp)
-      {
-    	  System.out.println(item);
-      	if (replaceAct.matches("(.*)"+item+"(.*)"))
-      	{
-      		actMatch++;
-      		System.out.println("Actual match count "+actMatch);
-      	}
-      }
+		String[] fullMenuExp = replaceExp.split(">");        
+		List<String> itemsExp= new ArrayList<String>();
+		for(int i = 0; i< fullMenuExp.length ; i++)
+		{
+			itemsExp.add(fullMenuExp[i]);
+		}
+//		System.out.println("Added items to expected list "+itemsExp);
+		String replaceAct = actualMenuList.replaceAll(" \\(.*?\\)", "");
+//		System.out.println("Modified actual list "+replaceAct);
+		for(String item: itemsExp)
+		{
+//			System.out.println(item);
+			if (replaceAct.matches("(.*)"+item+"(.*)"))
+			{
+				actMatch++;
+//				System.out.println("Actual match count "+actMatch);
+			}
+		}
    /* ArrayList<Integer> result = new ArrayList<Integer>();
     result.add(expMatch);
     result.add(actMatch);
   	return result;*/  	
   	
-  	int[] result = new int[2];
-  	result[0] = expMatch;
-  	result[1] = actMatch;
+		int[] result = new int[2];
+		result[0] = expMatch;
+		result[1] = actMatch;
   	
-  	System.out.println(result[0]+":"+result[1]);
-  	return result;
+		System.out.println(result[0]+":"+result[1]);
+		return result;
   	/*if (actMatch==expMatch)
   	{
   		return matchValue = "Matched. Expected count: "+expMatch+" and Actual count: "+actMatch; 
