@@ -53,7 +53,6 @@ public class PurchaseItems
   private WebDriverWait wait;
   private SignInPage signInP;
   private MyAccountPage myAccountP;
-  private ViewOrderPage viewOrderP;
   private AddToCartPage addToCartP;
   private CheckOutPage checkOutP;
   private SignOutPage signOutP;
@@ -70,7 +69,7 @@ public class PurchaseItems
    	  signInP = new SignInPage(driver);
    	  signInP.get();
    	  myAccountP = new MyAccountPage(driver);
-   	  viewOrderP = new ViewOrderPage(driver);
+   	  new ViewOrderPage(driver);
    	  addToCartP = new AddToCartPage(driver);
    	  checkOutP = new CheckOutPage(driver); 
    	  signOutP = new SignOutPage(driver);
@@ -87,7 +86,8 @@ public class PurchaseItems
 //	  addToCart();
 	  checkOutP.myCartCheckOut();
 	  checkOutP.billingShippingAddress();
-	  checkOutP.billingShippingMethod();
+	  String shippingMethod="Ground Shipping";
+	  checkOutP.billingShippingMethod(shippingMethod);
 	  OrderID = checkOutP.placeOrder();
       signOutP.signOut();
 	  Log.info("---------------- Test Case : 'Placing order' ends ----------------");

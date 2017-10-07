@@ -39,7 +39,7 @@ public class SignInPage extends LoadableComponent<SignInPage>
 	{
 		SignInPage.driver = driver;
 		PageFactory.initElements(driver, this);
-		Log.info("Home page is launched");
+		Log.info("SignIn Page loaded");
 		
 	}
 	
