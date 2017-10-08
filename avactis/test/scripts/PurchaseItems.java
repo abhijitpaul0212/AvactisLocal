@@ -20,6 +20,7 @@ import POM.MyAccountPage;
 import POM.SignInPage;
 import POM.SignOutPage;
 import POM.ViewOrderPage;
+import junit.framework.Assert;
 import utility.Homepage;
 import utility.Waiting;
 
@@ -59,10 +60,11 @@ public class PurchaseItems
   private CheckOutPage checkOutP;
   private SignOutPage signOutP;
   private String OrderID = null;
-  private String multiLevelMenu = "DVD;Up#Computers;mobile";
+  private String multiLevelMenu = "DVD;House, M.D.#Computers;mobile";
   private String singleLevelMenu = "Furniture;EKTORP TULLSTA Chair";
 //  private Dictionary<String, String> dict;
-  private HashMap<String,String> map;
+//  private HashMap<String, List<String>> map;
+  private static ArrayList<List<String>> expCartItemDetails;
   
   @BeforeClass(alwaysRun = true)
    public void beforeClass() 
@@ -80,31 +82,37 @@ public class PurchaseItems
   }
 
 	
- @Test(priority=1)
+  @Test(priority=1)
   public void shopping()
   {
 	  Log.info("---------------- Test Case : 'Placing order' begins ----------------");
 	  signInP.doSignIn("abhijitpaul_02@yahoo.com", "password123");	
-	  map = addToCartP.navigateMenuAddToCart(driver, 2, multiLevelMenu);	  
-	  map = addToCartP.navigateMenuAddToCart(driver, 1, singleLevelMenu);	  
+	  addToCartP.navigateMenuAddToCart(driver, 2, multiLevelMenu);	  
+	  addToCartP.navigateMenuAddToCart(driver, 1, singleLevelMenu);	  
 	  String expectedMenuList = singleLevelMenu+"#"+multiLevelMenu;	  
-	  checkOutP.myCartCheckOut();
+	  expCartItemDetails = new ArrayList<List<String>>();
+	  expCartItemDetails = checkOutP.myCartCheckOut(expectedMenuList);
+	  
+//	  checkOutP.myCartCheckOut(map,expectedMenuList);
 	  checkOutP.billingShippingAddress();
 	  String shippingMethod="Ground Shipping";
 	  checkOutP.billingShippingMethod(shippingMethod);
-	  OrderID = checkOutP.placeOrder(map);
+	  OrderID = checkOutP.placeOrder(expCartItemDetails);
       signOutP.signOut();
 	  Log.info("---------------- Test Case : 'Placing order' ends ----------------");
   }
   
-// @Test(priority=2)
+//  @Test(priority=2)
   public void orderValidating()
   {
 	  Log.info("---------------- Test Case : 'Validating placed order' begins ----------------");
-	  String expectedMenuList = singleLevelMenu+"#"+multiLevelMenu;
+//	  String expectedMenuList = singleLevelMenu+"#"+multiLevelMenu;
 	  signInP.doSignIn("abhijitpaul_02@yahoo.com", "password123");
-	  myAccountP.searchByOrderID(OrderID);
-	  ViewOrderPage.compareItems(driver,expectedMenuList);
+//	  myAccountP.searchByOrderID(OrderID);
+	  myAccountP.searchByOrderID("00943");
+//	  ViewOrderPage.compareItems(driver,expectedMenuList);
+	  Boolean returnVal = ViewOrderPage.compareItems(driver,expCartItemDetails);
+	  Assert.assertTrue(returnVal);
 	  signOutP.signOut();
 	  Log.info("---------------- Test Case : 'Validating placed order' ends ----------------");
   }
