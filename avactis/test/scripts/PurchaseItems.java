@@ -28,6 +28,8 @@ import org.testng.annotations.BeforeClass;
 import static org.testng.Assert.*;
 
 import java.util.ArrayList;
+import java.util.Dictionary;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -57,8 +59,10 @@ public class PurchaseItems
   private CheckOutPage checkOutP;
   private SignOutPage signOutP;
   private String OrderID = null;
-  private String multiLevelMenu = "DVD;Forbidden Planet#Computers;mobile";
+  private String multiLevelMenu = "DVD;Up#Computers;mobile";
   private String singleLevelMenu = "Furniture;EKTORP TULLSTA Chair";
+//  private Dictionary<String, String> dict;
+  private HashMap<String,String> map;
   
   @BeforeClass(alwaysRun = true)
    public void beforeClass() 
@@ -81,19 +85,19 @@ public class PurchaseItems
   {
 	  Log.info("---------------- Test Case : 'Placing order' begins ----------------");
 	  signInP.doSignIn("abhijitpaul_02@yahoo.com", "password123");	
-	  addToCartP.navigateMenuAddToCart(driver, 2, multiLevelMenu);	  
-	  addToCartP.navigateMenuAddToCart(driver, 1, singleLevelMenu);	  
-//	  addToCart();
+	  map = addToCartP.navigateMenuAddToCart(driver, 2, multiLevelMenu);	  
+	  map = addToCartP.navigateMenuAddToCart(driver, 1, singleLevelMenu);	  
+	  String expectedMenuList = singleLevelMenu+"#"+multiLevelMenu;	  
 	  checkOutP.myCartCheckOut();
 	  checkOutP.billingShippingAddress();
 	  String shippingMethod="Ground Shipping";
 	  checkOutP.billingShippingMethod(shippingMethod);
-	  OrderID = checkOutP.placeOrder();
+	  OrderID = checkOutP.placeOrder(map);
       signOutP.signOut();
 	  Log.info("---------------- Test Case : 'Placing order' ends ----------------");
   }
   
- @Test(priority=2)
+// @Test(priority=2)
   public void orderValidating()
   {
 	  Log.info("---------------- Test Case : 'Validating placed order' begins ----------------");
